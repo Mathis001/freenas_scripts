@@ -98,4 +98,5 @@ if { $ipmigw == "" } {
     expect $prompt
     send "logout\r"
     expect eof
+    
 }
