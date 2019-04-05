@@ -1,0 +1,1 @@
+sshpass -p 'abcd1234' ssh root@$2 "bash -s" -- < systemver $1

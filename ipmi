@@ -1,0 +1,30 @@
+if [[ $# -eq 0 ]] ; then
+    echo 'Please use one of the arguments: activate, info, reset'
+    exit 1
+fi
+if [[ $1 = "activate" ]] ; then
+    if [[ $# -eq 1 ]] ; then
+        echo 'Please enter an ip address'
+        exit 1
+    fi
+    echo 'Connecting to IPMI'
+    ipmitool -I lanplus -H $2 -U admin -P admin sol activate
+fi
+if [[ $1 = "info" ]] ; then
+    if [[ $# -eq 1 ]] ; then
+        echo 'Please enter an ip address'
+        exit 1
+    fi
+    echo 'Printing IPMI info'
+    ipmitool -I lanplus -H $2 -U admin -P admin sol info
+fi
+
+if [[ $1 = "reset" ]] ; then
+    if [[ $# -eq 1 ]] ; then
+        echo 'Please enter an ip address'
+        exit 1
+    fi
+    echo 'Resetting IPMI (bmc reset cold)'
+    ipmitool -I lanplus -H $2 -U admin -P admin bmc reset cold
+fi
+

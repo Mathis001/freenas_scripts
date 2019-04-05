@@ -1,0 +1,37 @@
+#!/bin/sh
+
+if [ ! -f dmidecode ]
+then echo "ERROR, YO! There's no dmidecode so you're probably in the wrong directory, dumbass."; exit
+fi
+
+echo ==========================================================================
+echo "Hostname:" `grep -m1 -A2 "Hostname" fndebug/Network/dump.txt | grep -v "\-----" | grep -v "Hostname"`
+grep -m1 "Serial Number:" dmidecode | sed "s/	//g"
+grep -m1 "Product Name:" dmidecode | sed "s/	//g"
+echo "OS Version:" `cat version`
+grep -m1 "load averages" fndebug/System/dump.txt
+echo ==========================================================================
+echo HARDWARE/SHELVES DETECTED
+grep "/dev/ses" fndebug/Hardware/dump.txt | grep "Enclosure Name"
+echo ==========================================================================
+echo Drives with Non-medium errors: `grep "Non-medium error count" fndebug/SMART/dump.txt | grep -v "error count:        0" | wc -l`
+echo Drives with Elements in grown defect list: `grep "Elements in grown defect list" fndebug/SMART/dump.txt | grep -v "defect list: 0" | wc -l`
+echo Drives with no self-tests logged: `grep "No self-tests have been logged" fndebug/SMART/dump.txt | wc -l`
+echo ==========================================================================
+echo ZPOOL SCRUBS, READ/WRITE/CKSUM ERRORS:
+sed -n '/zpool status/,/zpool history/p' fndebug/ZFS/dump.txt | grep -v "\------------" | grep -v "zpool history" | grep -v "zpool status" | grep -v '0     0     0' | grep -v logs | grep -v cache | grep -v spares | grep -v AVAIL | grep .
+# check for slightly different strings in older versions
+sed -n '/ZFS Pools Status/,/ZFS Pools History/p' fndebug/ZFS/dump.txt | grep -v "\------------" | grep -v "ZFS Pools" | grep -v "zpool status" | grep -v '0     0     0' | grep -v logs | grep -v cache | grep -v spares | grep -v AVAIL | grep .
+echo ==========================================================================
+echo UNCORRECTABLE SMART ERRORS:
+grep . fndebug/SMART/dump.txt | nawk '($1 ~ /\/dev/) {ldev = $1;} ($0 ~ /Product/  ) {lmo = $2} ($0 ~ /^Serial/  ) {lsn = $3} ($0 ~ /^read/  ) {luncorrread = $8} ($0 ~ /^write/  ) {luncorrwrite = $8; print (ldev " " lmo " " lsn " read: " luncorrread " write: " luncorrwrite) }' | grep -v "read: 0 write: 0"
+echo ==========================================================================
+echo VERIFY:
+grep . fndebug/Verify/dump.txt
+echo ==========================================================================
+echo CRASHES:
+if [ -f crash/info.last ]
+then grep "Dumptime" crash/info.? ; 
+else echo "No crashes found"
+fi
+echo ==========================================================================
