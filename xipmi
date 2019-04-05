@@ -1,0 +1,101 @@
+#!/usr/bin/expect -f
+
+set timeout 20
+set addr [lindex $argv 0]
+set ipminet [lindex $argv 1]
+set ipmiip [lindex $argv 2]
+set ipmigw [lindex $argv 3]
+set prompt ":~ # "
+set ipmiprompt "~ # "
+
+if { $ipmigw == "" } {
+
+    spawn $env(SHELL)
+    send_user "Please enter the command as follows\n"
+    send_user "xipmi <IP> <IPMI Netmask> <IPMI Address> <IPMI Gateway>\n"
+    send_user "Where <IP> is the connecting IP over SSH\n"
+    send_user "Where <IPMI Netmask> is the IPMI netmask to set\n"
+    send_user "Where <IPMI Address> is the IPMI address to set\n"
+    send_user "Where <IPMI Gateway> is the IPMI gateway to set\n"
+    send_user "Example:\n"
+    send_user "xipmi 10.20.21.151 255.255.254.0 10.20.20.207 10.20.20.1\n"
+    exit
+
+} else {
+
+    spawn ssh root@$addr
+    expect {    
+        "yes/no)?" {
+            send "yes\r"
+            expect "assword:"
+            send "abcd1234\r"
+        } "assword:" {
+            send "abcd1234\r"
+        } timeout {
+            exit
+        } eof {
+            exit
+        }
+    }
+
+    expect $prompt
+    send "pkill cu\r"
+    expect $prompt
+    send "cu -l cuaU0 -s 38400\r"
+    sleep 5
+    send "\r"
+    expect {
+        "assword:" {
+            send "\r"
+            expect {
+                "login:" {
+                send "sysadmin\r"
+                expect "assword:"
+                send "superuser\r"
+                }
+            }
+        } "login:" {
+            send "sysadmin\r"
+            expect "assword:"
+            send "superuser\r"
+        } $ipmiprompt {
+            send "\r"
+        } timeout {
+            exit
+        } eof {
+            exit
+        }
+    }
+    sleep 15
+    send "clear\r"
+
+    expect $ipmiprompt
+    send "ipmitool -l lan -H 127.0.0.1 -U admin -P admin raw 6 1\r"
+    sleep 5
+    expect $ipmiprompt
+    send "ipmitool -H 127.0.0.1 -U admin -P admin lan set 1 ipsrc static\r"
+    sleep 20
+    expect $ipmiprompt
+    send "ipmitool -H 127.0.0.1 -U admin -P admin lan set 1 netmask $ipminet\r"
+    sleep 20
+    expect $ipmiprompt
+    send "ipmitool -H 127.0.0.1 -U admin -P admin lan set 1 ipaddr $ipmiip\r"
+    sleep 20
+    expect $ipmiprompt
+    send "ipmitool -H 127.0.0.1 -U admin -P admin lan set 1 defgw ipaddr $ipmigw\r"
+    sleep 20
+    expect $ipmiprompt
+    send "ipmitool -H 127.0.0.1 -U admin -P admin lan print 1\r"
+    send "\r"
+    sleep 20
+
+    expect $ipmiprompt
+    send "\r"
+
+    expect $ipmiprompt
+    send "\r~~."
+
+    expect $prompt
+    send "logout\r"
+    expect eof
+}
