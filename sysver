@@ -1,1 +1,2 @@
-sshpass -p 'abcd1234' ssh root@$2 "bash -s" -- < systemver $1
+#! /bin/bash
+sshpass -p 'abcd1234' ssh root@$2 "bash -s" -- < $HOME/.scripts/systemver $1
