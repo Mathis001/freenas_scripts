@@ -1,8 +1,16 @@
 # freenas_scripts
 
+Create `.scripts` folder in your home directory
+
+`mkdir ~/.scripts`
+
 Create a link from this folder to /home/user/.scripts
 
-`ln -s /path/to/freenas_scripts /home/user/.scripts`
+`ln -s /path/to/freenas_scripts/* /home/user/.scripts`
+
+Create `.bashrc` entry to look in the new scripts folder
+
+`echo 'export PATH="$HOME/.scripts:$PATH"' >> ~/.bashrc`
 
 # Run the commands from anywhere
 
