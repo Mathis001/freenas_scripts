@@ -4,7 +4,7 @@ Create `.scripts` folder in your home directory
 
 `mkdir ~/.scripts`
 
-Create a link from this folder to /home/user/.scripts
+Create a link from this folder to `/home/user/.scripts`
 
 `ln -s /path/to/freenas_scripts/* /home/user/.scripts`
 
