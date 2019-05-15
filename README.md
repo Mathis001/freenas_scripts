@@ -1,8 +1,26 @@
 # freenas_scripts
 
-Create a link from this folder to /home/user/.scripts
+### Clone repo
 
-`ln -s /path/to/freenas_scripts /home/user/.scripts`
+`sudo git clone https://github.com/Mathis001/freenas_scripts.git ~/Documents/freenas_scripts`
+
+### Create `.scripts` folder in your home directory
+
+`mkdir ~/.scripts`
+
+### Create a link from this folder to `~/.scripts`
+
+`ln -s ~/Documents/freenas_scripts/* ~/.scripts`
+
+### Create `.bashrc` entry to look in the new scripts folder
+
+`echo 'export PATH="$HOME/.scripts:$PATH"' >> ~/.bashrc`
+
+# Requirements
+
+### Install sshpass and except
+
+`sudo apt install sshpass except`
 
 # Run the commands from anywhere
 
