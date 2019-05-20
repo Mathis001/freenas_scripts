@@ -20,7 +20,15 @@
 
 ### Install sshpass and except
 
+##### Ubuntu
 `sudo apt install sshpass except`
+
+##### FreeBSD
+`cd /usr/ports/security/sshpass/ && make install clean`
+`pkg install sshpass`
+
+`cd /usr/ports/lang/expect/ && make install clean`
+`pkg install expect`
 
 # Run the commands from anywhere
 
